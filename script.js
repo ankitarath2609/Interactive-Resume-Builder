@@ -1,0 +1,217 @@
+
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+
+const form = $('#resumeForm');
+const preview = $('#resumePreview');
+const progressBar = $('#progressBar');
+
+
+const fullName = $('#fullName');
+const phone = $('#phone');
+const email = $('#email');
+const locationInput = $('#location');
+const summary = $('#summary');
+
+const pName = $('#pName');
+const pTitle = $('#pTitle');
+const pContact = $('#pContact');
+const pSummary = $('#pSummary');
+const pSkills = $('#pSkills');
+const pEducation = $('#pEducation');
+const pExperience = $('#pExperience');
+
+
+const eduList = $('#eduList');
+const expList = $('#expList');
+const eduTpl = document.getElementById('eduTpl');
+const expTpl = document.getElementById('expTpl');
+
+
+const skillInput = $('#skillInput');
+const addSkillBtn = $('#addSkillBtn');
+const skillsWrap = $('#skills');
+let skills = [];
+
+
+const addEdu = $('#addEdu');
+const addExp = $('#addExp');
+const clearBtn = $('#clearBtn');
+const downloadBtn = $('#downloadBtn');
+
+setTimeout(() => preview.classList.add('visible'), 80);
+
+function addEduRow(data = { school: '', degree: '', year: '' }) {
+  const node = eduTpl.content.cloneNode(true);
+  const el = node.querySelector('.item');
+  el.querySelector('.eduSchool').value = data.school;
+  el.querySelector('.eduDegree').value = data.degree;
+  el.querySelector('.eduYear').value = data.year;
+  eduList.appendChild(el);
+  attachEduHandlers();
+  updateAll();
+}
+
+function addExpRow(data = { role: '', org: '', desc: '' }) {
+  const node = expTpl.content.cloneNode(true);
+  const el = node.querySelector('.item');
+  el.querySelector('.expRole').value = data.role;
+  el.querySelector('.expOrg').value = data.org;
+  el.querySelector('.expDesc').value = data.desc;
+  expList.appendChild(el);
+  attachExpHandlers();
+  updateAll();
+}
+
+function attachEduHandlers() {
+  $$('.removeEdu', eduList).forEach(btn => btn.onclick = () => { btn.closest('.item').remove(); updateAll(); });
+  $$('.eduSchool, .eduDegree, .eduYear', eduList).forEach(i => i.oninput = updateAll);
+}
+
+function attachExpHandlers() {
+  $$('.removeExp', expList).forEach(btn => btn.onclick = () => { btn.closest('.item').remove(); updateAll(); });
+  $$('.expRole, .expOrg, .expDesc', expList).forEach(i => i.oninput = updateAll);
+}
+
+addEdu.onclick = () => addEduRow();
+addExp.onclick = () => addExpRow();
+
+function renderSkills() {
+  skillsWrap.innerHTML = '';
+  pSkills.innerHTML = '';
+  if (skills.length) {
+    skills.forEach((s, idx) => {
+      const el = document.createElement('div');
+      el.className = 'tag';
+      el.textContent = s;
+      const rem = document.createElement('button');
+      rem.className = 'btn ghost small';
+      rem.textContent = 'x';
+      rem.onclick = () => { skills.splice(idx, 1); renderSkills(); updateAll(); };
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'inline-flex';
+      wrapper.style.alignItems = 'center';
+      wrapper.appendChild(el);
+      wrapper.appendChild(rem);
+      skillsWrap.appendChild(wrapper);
+
+      const pill = document.createElement('span');
+      pill.className = 'skill';
+      pill.textContent = s;
+      pSkills.appendChild(pill);
+    });
+  }
+}
+
+addSkillBtn.onclick = () => {
+  const v = skillInput.value.trim();
+  if (v) {
+    skills.push(v);
+    skillInput.value = '';
+    renderSkills();
+    updateAll();
+  }
+};
+
+skillInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    addSkillBtn.click();
+  }
+});
+
+[fullName, phone, email, locationInput, summary].forEach(inp => inp.addEventListener('input', updateAll));
+
+function updateAll() {
+  const fields = [fullName.value, phone.value, email.value, locationInput.value, summary.value];
+  let filled = fields.filter(Boolean).length + (skills.length > 0 ? 1 : 0);
+
+  const eduCount = $$('.item', eduList).length;
+  const expCount = $$('.item', expList).length;
+
+  const eduFilled = $$('.eduSchool, .eduDegree, .eduYear', eduList).filter(i => i.value.trim()).length;
+  const expFilled = $$('.expRole, .expOrg, .expDesc', expList).filter(i => i.value.trim()).length;
+
+  const totalSteps = 8 + Math.max(eduCount, 1) * 3 + Math.max(expCount, 1) * 3;
+  const current = filled + eduFilled + expFilled;
+  const percent = Math.min(100, Math.round(100 * (current / totalSteps)));
+  progressBar.style.width = percent + '%';
+
+  pName.textContent = fullName.value || 'Your Name';
+  pTitle.textContent = summary.value ? summary.value.split('.')[0] : 'Profession • Title';
+  pContact.textContent = [email.value || 'email', phone.value || 'phone', locationInput.value || 'location'].join(' • ');
+  pSummary.textContent = summary.value || 'A short profile summary will appear here as you type.';
+
+  pEducation.innerHTML = '';
+  const edus = [];
+  $$('.item', eduList).forEach(item => {
+    const school = item.querySelector('.eduSchool').value.trim();
+    const degree = item.querySelector('.eduDegree').value.trim();
+    const year = item.querySelector('.eduYear').value.trim();
+    if (school || degree || year) {
+      edus.push({ school, degree, year });
+      const block = document.createElement('div');
+      block.className = 'edu-block mini';
+      block.innerHTML = `<strong>${school}</strong> <span style="float:right;opacity:.7">${year}</span><div>${degree}</div>`;
+      pEducation.appendChild(block);
+    }
+  });
+  if (edus.length) {
+    const title = document.createElement('h3');
+    title.textContent = 'Education';
+    pEducation.prepend(title);
+  }
+
+  pExperience.innerHTML = '';
+  const exps = [];
+  $$('.item', expList).forEach(item => {
+    const role = item.querySelector('.expRole').value.trim();
+    const org = item.querySelector('.expOrg').value.trim();
+    const desc = item.querySelector('.expDesc').value.trim();
+    if (role || org || desc) {
+      exps.push({ role, org, desc });
+      const block = document.createElement('div');
+      block.className = 'exp-block mini';
+      block.innerHTML = `<strong>${role}</strong> <span style="float:right;opacity:.7">${org}</span><div>${desc}</div>`;
+      pExperience.appendChild(block);
+    }
+  });
+  if (exps.length) {
+    const title = document.createElement('h3');
+    title.textContent = 'Experience';
+    pExperience.prepend(title);
+  }
+}
+
+clearBtn.onclick = () => {
+  if (confirm('Clear the entire form and preview?')) {
+    form.reset();
+    skills = [];
+    renderSkills();
+    eduList.innerHTML = '';
+    expList.innerHTML = '';
+    addEduRow();
+    addExpRow();
+    updateAll();
+  }
+};
+
+downloadBtn.onclick = () => {
+  const node = document.getElementById('resumePreview');
+  if (window.html2pdf) {
+    const opt = { margin: 0.4, filename: (fullName.value || 'resume') + '.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+    html2pdf().set(opt).from(node).save();
+  } else {
+    const w = window.open('', '_blank');
+    const doc = w.document;
+    doc.write('<!doctype html><html><head><title>Resume</title></head><body>' + node.outerHTML + '</body></html>');
+    doc.close();
+    w.focus();
+    setTimeout(() => w.print(), 500);
+  }
+};
+
+addEduRow();
+addExpRow();
+renderSkills();
+updateAll();

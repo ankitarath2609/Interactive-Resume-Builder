@@ -1,0 +1,153 @@
+:root {
+  --accent: #0f766e;
+  --muted: #6b7280;
+  --bg: #0f172a;
+  --card: #ffffff;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #e6fffa 0%, #ffffff 100%);
+  color: #0b1220;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 28px auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 6px 30px rgba(2, 6, 23, 0.08);
+  padding: 18px;
+  overflow: hidden;
+}
+
+h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+}
+
+label {
+  font-size: 13px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  outline: none;
+  transition: all 0.18s ease;
+  font-size: 14px;
+}
+
+input:focus,
+textarea:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.08);
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn:hover {
+  background: #115e59;
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid #e6e9ee;
+  color: var(--muted);
+}
+
+.small {
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.progress {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress > i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), #2563eb);
+  transition: width 0.3s ease;
+}
+
+.resume {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  min-height: 400px;
+  transition: transform 0.3s ease, opacity 0.25s ease;
+  transform-origin: top;
+  opacity: 0;
+  transform: translateY(20px) scale(0.995);
+}
+
+.resume.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.skill {
+  display: inline-block;
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid #e6e9ee;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .resume {
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 480px) {
+  .resume {
+    padding: 14px;
+  }
+}
