@@ -1,217 +1,160 @@
-
-const $ = (s, el = document) => el.querySelector(s);
-const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
-
-const form = $('#resumeForm');
-const preview = $('#resumePreview');
-const progressBar = $('#progressBar');
-
-
-const fullName = $('#fullName');
-const phone = $('#phone');
-const email = $('#email');
-const locationInput = $('#location');
-const summary = $('#summary');
-
-const pName = $('#pName');
-const pTitle = $('#pTitle');
-const pContact = $('#pContact');
-const pSummary = $('#pSummary');
-const pSkills = $('#pSkills');
-const pEducation = $('#pEducation');
-const pExperience = $('#pExperience');
-
-
-const eduList = $('#eduList');
-const expList = $('#expList');
-const eduTpl = document.getElementById('eduTpl');
-const expTpl = document.getElementById('expTpl');
-
-
-const skillInput = $('#skillInput');
-const addSkillBtn = $('#addSkillBtn');
-const skillsWrap = $('#skills');
-let skills = [];
-
-
-const addEdu = $('#addEdu');
-const addExp = $('#addExp');
-const clearBtn = $('#clearBtn');
-const downloadBtn = $('#downloadBtn');
-
-setTimeout(() => preview.classList.add('visible'), 80);
-
-function addEduRow(data = { school: '', degree: '', year: '' }) {
-  const node = eduTpl.content.cloneNode(true);
-  const el = node.querySelector('.item');
-  el.querySelector('.eduSchool').value = data.school;
-  el.querySelector('.eduDegree').value = data.degree;
-  el.querySelector('.eduYear').value = data.year;
-  eduList.appendChild(el);
-  attachEduHandlers();
-  updateAll();
+:root {
+  --accent: #0f766e;
+  --muted: #6b7280;
+  --bg: #0f172a;
+  --card: #ffffff;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
 }
 
-function addExpRow(data = { role: '', org: '', desc: '' }) {
-  const node = expTpl.content.cloneNode(true);
-  const el = node.querySelector('.item');
-  el.querySelector('.expRole').value = data.role;
-  el.querySelector('.expOrg').value = data.org;
-  el.querySelector('.expDesc').value = data.desc;
-  expList.appendChild(el);
-  attachExpHandlers();
-  updateAll();
+* {
+  box-sizing: border-box;
 }
 
-function attachEduHandlers() {
-  $$('.removeEdu', eduList).forEach(btn => btn.onclick = () => { btn.closest('.item').remove(); updateAll(); });
-  $$('.eduSchool, .eduDegree, .eduYear', eduList).forEach(i => i.oninput = updateAll);
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #e6fffa 0%, #ffffff 100%);
+  color: #0b1220;
 }
 
-function attachExpHandlers() {
-  $$('.removeExp', expList).forEach(btn => btn.onclick = () => { btn.closest('.item').remove(); updateAll(); });
-  $$('.expRole, .expOrg, .expDesc', expList).forEach(i => i.oninput = updateAll);
+.app {
+  max-width: 1200px;
+  margin: 28px auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
 }
 
-addEdu.onclick = () => addEduRow();
-addExp.onclick = () => addExpRow();
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 6px 30px rgba(2, 6, 23, 0.08);
+  padding: 18px;
+  overflow: hidden;
+}
 
-function renderSkills() {
-  skillsWrap.innerHTML = '';
-  pSkills.innerHTML = '';
-  if (skills.length) {
-    skills.forEach((s, idx) => {
-      const el = document.createElement('div');
-      el.className = 'tag';
-      el.textContent = s;
-      const rem = document.createElement('button');
-      rem.className = 'btn ghost small';
-      rem.textContent = 'x';
-      rem.onclick = () => { skills.splice(idx, 1); renderSkills(); updateAll(); };
-      const wrapper = document.createElement('div');
-      wrapper.style.display = 'inline-flex';
-      wrapper.style.alignItems = 'center';
-      wrapper.appendChild(el);
-      wrapper.appendChild(rem);
-      skillsWrap.appendChild(wrapper);
+h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+}
 
-      const pill = document.createElement('span');
-      pill.className = 'skill';
-      pill.textContent = s;
-      pSkills.appendChild(pill);
-    });
+label {
+  font-size: 13px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  outline: none;
+  transition: all 0.18s ease;
+  font-size: 14px;
+}
+
+input:focus,
+textarea:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.08);
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn:hover {
+  background: #115e59;
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid #e6e9ee;
+  color: var(--muted);
+}
+
+.small {
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.progress {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress > i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), #2563eb);
+  transition: width 0.3s ease;
+}
+
+.resume {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  min-height: 400px;
+  transition: transform 0.3s ease, opacity 0.25s ease;
+  transform-origin: top;
+  opacity: 0;
+  transform: translateY(20px) scale(0.995);
+}
+
+.resume.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.skill {
+  display: inline-block;
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid #e6e9ee;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    padding: 12px;
   }
-}
-
-addSkillBtn.onclick = () => {
-  const v = skillInput.value.trim();
-  if (v) {
-    skills.push(v);
-    skillInput.value = '';
-    renderSkills();
-    updateAll();
-  }
-};
-
-skillInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    addSkillBtn.click();
-  }
-});
-
-[fullName, phone, email, locationInput, summary].forEach(inp => inp.addEventListener('input', updateAll));
-
-function updateAll() {
-  const fields = [fullName.value, phone.value, email.value, locationInput.value, summary.value];
-  let filled = fields.filter(Boolean).length + (skills.length > 0 ? 1 : 0);
-
-  const eduCount = $$('.item', eduList).length;
-  const expCount = $$('.item', expList).length;
-
-  const eduFilled = $$('.eduSchool, .eduDegree, .eduYear', eduList).filter(i => i.value.trim()).length;
-  const expFilled = $$('.expRole, .expOrg, .expDesc', expList).filter(i => i.value.trim()).length;
-
-  const totalSteps = 8 + Math.max(eduCount, 1) * 3 + Math.max(expCount, 1) * 3;
-  const current = filled + eduFilled + expFilled;
-  const percent = Math.min(100, Math.round(100 * (current / totalSteps)));
-  progressBar.style.width = percent + '%';
-
-  pName.textContent = fullName.value || 'Your Name';
-  pTitle.textContent = summary.value ? summary.value.split('.')[0] : 'Profession • Title';
-  pContact.textContent = [email.value || 'email', phone.value || 'phone', locationInput.value || 'location'].join(' • ');
-  pSummary.textContent = summary.value || 'A short profile summary will appear here as you type.';
-
-  pEducation.innerHTML = '';
-  const edus = [];
-  $$('.item', eduList).forEach(item => {
-    const school = item.querySelector('.eduSchool').value.trim();
-    const degree = item.querySelector('.eduDegree').value.trim();
-    const year = item.querySelector('.eduYear').value.trim();
-    if (school || degree || year) {
-      edus.push({ school, degree, year });
-      const block = document.createElement('div');
-      block.className = 'edu-block mini';
-      block.innerHTML = `<strong>${school}</strong> <span style="float:right;opacity:.7">${year}</span><div>${degree}</div>`;
-      pEducation.appendChild(block);
-    }
-  });
-  if (edus.length) {
-    const title = document.createElement('h3');
-    title.textContent = 'Education';
-    pEducation.prepend(title);
-  }
-
-  pExperience.innerHTML = '';
-  const exps = [];
-  $$('.item', expList).forEach(item => {
-    const role = item.querySelector('.expRole').value.trim();
-    const org = item.querySelector('.expOrg').value.trim();
-    const desc = item.querySelector('.expDesc').value.trim();
-    if (role || org || desc) {
-      exps.push({ role, org, desc });
-      const block = document.createElement('div');
-      block.className = 'exp-block mini';
-      block.innerHTML = `<strong>${role}</strong> <span style="float:right;opacity:.7">${org}</span><div>${desc}</div>`;
-      pExperience.appendChild(block);
-    }
-  });
-  if (exps.length) {
-    const title = document.createElement('h3');
-    title.textContent = 'Experience';
-    pExperience.prepend(title);
+  .resume {
+    min-height: 380px;
   }
 }
 
-clearBtn.onclick = () => {
-  if (confirm('Clear the entire form and preview?')) {
-    form.reset();
-    skills = [];
-    renderSkills();
-    eduList.innerHTML = '';
-    expList.innerHTML = '';
-    addEduRow();
-    addExpRow();
-    updateAll();
+@media (max-width: 480px) {
+  .resume {
+    padding: 14px;
   }
-};
+}
 
-downloadBtn.onclick = () => {
-  const node = document.getElementById('resumePreview');
-  if (window.html2pdf) {
-    const opt = { margin: 0.4, filename: (fullName.value || 'resume') + '.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
-    html2pdf().set(opt).from(node).save();
-  } else {
-    const w = window.open('', '_blank');
-    const doc = w.document;
-    doc.write('<!doctype html><html><head><title>Resume</title></head><body>' + node.outerHTML + '</body></html>');
-    doc.close();
-    w.focus();
-    setTimeout(() => w.print(), 500);
-  }
-};
 
-addEduRow();
-addExpRow();
-renderSkills();
-updateAll();
+
+
+
+ 
+
